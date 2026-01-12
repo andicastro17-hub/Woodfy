@@ -11,13 +11,6 @@ export enum PaymentStatus {
   OVERDUE = 'Atrasado'
 }
 
-export enum CostCategory {
-  MATERIAL = 'Material',
-  LABOR = 'Mão de obra',
-  TRANSPORT = 'Transporte',
-  THIRD_PARTY = 'Terceiros'
-}
-
 export enum CostType {
   FIXED = 'Fixo',
   VARIABLE = 'Variável'
@@ -29,32 +22,40 @@ export interface Project {
   clientId: string;
   clientName: string; // Denormalized for quick access
   type: string;
+  description: string;
   startDate: string;
-  deliveryDate: string;
+  deliveryDate?: string;
   valueSold: number;
-  estimatedCost: number;
+  estimatedCost?: number;
   realCost: number;
   status: ProjectStatus;
   paymentStatus: PaymentStatus;
+  paymentMethod?: string;
 }
 
 export interface Cost {
   id: string;
-  projectId: string;
-  category: CostCategory;
+  category: string;
   description: string;
   value: number;
   date: string;
   type: CostType;
+  supplierId?: string;
+  paymentMethod?: string;
+  notes?: string;
+  projectId?: string;
 }
 
 export interface Revenue {
   id: string;
-  projectId: string;
+  projectId?: string; // Optional: for revenues not linked to projects
+  description?: string; // For non-project revenues
+  category?: string; // For non-project revenues
   value: number;
   paymentMethod: string;
   date: string;
   status: PaymentStatus;
+  notes?: string;
 }
 
 export interface Customer {
@@ -70,26 +71,41 @@ export interface Customer {
 export interface Supplier {
   id: string;
   name: string;
-  category: 'MDF' | 'Ferragens' | 'Ferramentas' | 'Serviços' | 'Outros';
-  contact: string;
+  category: 'MDF' | 'Ferragens' | 'Ferramentas' | 'Serviços' | 'Outros' | 'Vidros' | 'Metais' | 'Terceirização' | 'Usinagem' | 'Telefonia';
+  phone: string;
+  email: string;
   rating: number;
 }
 
 export interface GeneralExpense {
   id: string;
   description: string;
-  category: 'Aluguel' | 'Energia' | 'Marketing' | 'Ferramentas' | 'Impostos' | 'Outros';
+  category: 'Aluguel' | 'Energia' | 'Marketing' | 'Ferramentas' | 'Impostos' | 'Outros' | 'Água' | 'Internet' | 'Telefone' | 'Contabilidade' | 'Salários' | 'Frete' | 'Descarte de Resíduos';
   value: number;
   dueDate: string;
   status: PaymentStatus;
+  supplierId?: string;
+  paymentMethod?: string;
+  notes?: string;
 }
 
-export interface Sale {
+export interface BudgetItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+export interface Budget {
   id: string;
   customerId: string;
   customerName: string;
   date: string;
-  totalValue: number;
-  items: string;
-  paymentMethod: string;
+  items: BudgetItem[];
+  totalCost: number;
+  multiplier: number;
+  taxes: number;
+  finalPrice: number;
+  status: 'Rascunho' | 'Enviado' | 'Aprovado' | 'Rejeitado';
 }
